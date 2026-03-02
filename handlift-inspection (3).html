@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ระบบตรวจสอบแฮนด์ลิฟท์</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════════
+   BASE RESET
+══════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:#f0f4fa;
+  color:#1e293b;
+  min-height:100vh;
+}
+
+/* ══════════════════════════════════════════
+   LAYOUT — DESKTOP (sidebar + main)
+══════════════════════════════════════════ */
+#layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+#sidebar{
+  width:220px;flex-shrink:0;
+  background:linear-gradient(180deg,#0c2240 0%,#1a3a6b 100%);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;
+  z-index:200;
+}
+.sb-brand{
+  padding:24px 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.sb-logo{font-size:28px;margin-bottom:6px;}
+.sb-title{color:#fff;font-weight:800;font-size:15px;line-height:1.3;}
+.sb-sub{color:#7baed4;font-size:10px;margin-top:2px;display:block;}
+.sb-nav{padding:16px 12px;flex:1;}
+.sb-nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;border-radius:12px;
+  color:#93c5fd;font-size:13px;font-weight:600;
+  cursor:pointer;border:none;background:transparent;
+  width:100%;text-align:left;font-family:'Sarabun',sans-serif;
+  transition:all 0.2s;margin-bottom:4px;
+}
+.sb-nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.sb-nav-item.active{background:rgba(59,130,246,0.25);color:#fff;border:1px solid rgba(59,130,246,0.35);}
+.sb-nav-item .ni{font-size:18px;width:24px;text-align:center;}
+.sb-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08);}
+.sb-footer p{color:#4a6fa3;font-size:10px;line-height:1.5;}
+
+/* MAIN AREA */
+#main{
+  margin-left:220px;
+  flex:1;
+  display:flex;flex-direction:column;
+  min-height:100vh;
+}
+
+/* TOP BAR */
+#topbar{
+  background:#fff;
+  border-bottom:1px solid #e8ecf3;
+  padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);
+}
+#topbar h1{font-size:17px;font-weight:800;color:#0c2240;}
+#topbar .tb-sub{font-size:12px;color:#94a3b8;font-weight:400;}
+.tb-time{
+  background:#f0f4fa;border-radius:10px;padding:8px 16px;
+  font-size:13px;font-weight:700;color:#1a3a6b;
+}
+
+/* PAGE CONTENT */
+#content{
+  flex:1;padding:28px;
+  overflow-y:auto;
+}
+
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+.page{display:none;animation:fi 0.22s ease;}
+.page.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══════════════════════════════════════════
+   HOME PAGE
+══════════════════════════════════════════ */
+.home-banner{
+  background:linear-gradient(135deg,#0c2240 0%,#1a3a6b 60%,#1e50a0 100%);
+  border-radius:20px;padding:28px 32px;margin-bottom:24px;
+  display:flex;align-items:center;gap:32px;
+  box-shadow:0 8px 32px rgba(15,38,71,0.2);
+  position:relative;overflow:hidden;
+}
+.home-banner::before{
+  content:'🏭';position:absolute;right:32px;top:50%;
+  transform:translateY(-50%);font-size:80px;opacity:0.12;
+}
+.hb-text h2{color:#fff;font-size:22px;font-weight:800;margin-bottom:4px;}
+.hb-text p{color:#7baed4;font-size:13px;}
+.stat-row{display:flex;gap:16px;margin-top:18px;}
+.stat-card{
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
+  border-radius:14px;padding:12px 20px;min-width:90px;
+  backdrop-filter:blur(4px);text-align:center;
+}
+.stat-card .snum{font-size:26px;font-weight:800;color:#fff;line-height:1;}
+.stat-card .slbl{font-size:10px;color:#93c5fd;margin-top:3px;}
+
+.section-title{
+  font-size:12px;font-weight:700;color:#94a3b8;
+  letter-spacing:0.07em;text-transform:uppercase;margin-bottom:12px;
+}
+
+/* HOME TABLE */
+.table-card{
+  background:#fff;border-radius:16px;
+  border:1px solid #e8ecf3;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  overflow:hidden;margin-bottom:24px;
+}
+.hl-table{width:100%;border-collapse:collapse;}
+.hl-table thead{background:linear-gradient(90deg,#0c2240,#1a3a6b);}
+.hl-table th{
+  padding:12px 16px;text-align:left;
+  font-size:11px;font-weight:700;color:#93c5fd;
+  letter-spacing:0.05em;
+}
+.hl-table tbody tr{
+  border-bottom:1px solid #f1f5f9;
+  transition:background 0.15s;cursor:pointer;
+}
+.hl-table tbody tr:last-child{border-bottom:none;}
+.hl-table tbody tr:hover{background:#f0f6ff;}
+.hl-table td{padding:12px 16px;font-size:13px;color:#334155;vertical-align:middle;}
+.hl-id{font-weight:700;color:#1a3a6b;font-size:12px;}
+.hl-loc{color:#94a3b8;font-size:11px;margin-top:2px;}
+.wbadge{
+  display:inline-block;background:#eff6ff;color:#1d4ed8;
+  border:1px solid #bfdbfe;border-radius:8px;
+  padding:3px 10px;font-size:11px;font-weight:700;
+}
+.insp-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,#1a3a6b,#2563eb);
+  color:#fff;border:none;border-radius:10px;
+  padding:7px 14px;font-size:12px;font-weight:700;
+  font-family:'Sarabun',sans-serif;cursor:pointer;
+  box-shadow:0 2px 8px rgba(37,99,235,0.3);transition:all 0.2s;
+}
+.insp-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.4);}
+
+/* ══════════════════════════════════════════
+   INSPECT PAGE
+══════════════════════════════════════════ */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#fff;border:1px solid #e2e8f0;
+  color:#475569;padding:9px 16px;border-radius:10px;
+  font-family:'Sarabun',sans-serif;font-size:13px;
+  cursor:pointer;margin-bottom:20px;font-weight:600;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:all 0.15s;
+}
+.back-btn:hover{background:#f8fafc;border-color:#cbd5e1;}
+
+.inspect-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.inspect-full{grid-column:1/-1;}
+
+/* HL HEADER CARD */
+.hl-banner{
+  background:linear-gradient(135deg,#0c2240,#1a3a6b,#1e50a0);
+  border-radius:16px;padding:20px 24px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:0 6px 20px rgba(15,38,71,0.25);
+  grid-column:1/-1;
+}
+.hb-icon{font-size:44px;}
+.hb-id{color:#fff;font-weight:800;font-size:18px;}
+.hb-sub{color:#7baed4;font-size:11px;margin-top:3px;}
+.hb-badge{
+  margin-left:auto;background:rgba(255,255,255,0.15);
+  border:1px solid rgba(255,255,255,0.25);border-radius:20px;
+  color:#fff;font-size:13px;font-weight:700;padding:7px 18px;
+}
+
+/* CARD */
+.card{
+  background:#fff;border:1px solid #e8ecf3;border-radius:16px;
+  padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.06);
+}
+.card-title{
+  font-weight:700;font-size:14px;color:#0c2240;
+  margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1px solid #f0f4f8;
+  display:flex;align-items:center;gap:7px;
+}
+
+/* INPUTS */
+.inp-group{margin-bottom:12px;}
+.inp-label{font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;display:block;}
+input[type=text],textarea{
+  width:100%;padding:10px 14px;
+  background:#f8fafc;border:1.5px solid #e2e8f0;
+  border-radius:10px;color:#1e293b;
+  font-family:'Sarabun',sans-serif;font-size:13px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+input[type=text]:focus,textarea:focus{
+  outline:none;border-color:#2563eb;background:#fff;
+  box-shadow:0 0 0 3px rgba(37,99,235,0.1);
+}
+textarea{min-height:80px;resize:vertical;}
+
+/* CHECK TABLE */
+.ck-table{width:100%;border-collapse:collapse;}
+.ck-table thead th{
+  padding:9px 8px;border-bottom:2px solid #f0f4f8;
+  font-size:11px;font-weight:700;color:#94a3b8;text-align:left;
+}
+.ck-table thead th.ch{text-align:center;width:52px;}
+.ck-table thead th.ok-h{color:#16a34a;}
+.ck-table thead th.ng-h{color:#dc2626;}
+.ck-table tbody tr{border-bottom:1px solid #f8fafc;}
+.ck-table tbody td{padding:10px 8px;font-size:13px;color:#334155;}
+.ck-table tbody td.ch{text-align:center;}
+.rbtn{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid #d1d5db;background:#f9fafb;
+  cursor:pointer;font-size:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:all 0.18s;
+}
+.rbtn:hover{border-color:#94a3b8;background:#f3f4f6;}
+.rbtn.ok-on{border-color:#16a34a;background:#16a34a;color:#fff;box-shadow:0 0 0 3px #bbf7d0;}
+.rbtn.ng-on{border-color:#dc2626;background:#dc2626;color:#fff;box-shadow:0 0 0 3px #fecaca;}
+
+/* STATUS CHIPS */
+.s-group{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.s-chip{
+  padding:9px 16px;border-radius:20px;border:2px solid;
+  cursor:pointer;font-family:'Sarabun',sans-serif;
+  font-size:12px;font-weight:700;background:transparent;transition:all 0.2s;
+}
+
+/* SUBMIT */
+.submit-btn{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,#1a3a6b,#2563eb);
+  color:#fff;border:none;border-radius:14px;
+  font-family:'Sarabun',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;box-shadow:0 6px 20px rgba(37,99,235,0.35);
+  transition:all 0.2s;
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,0.45);}
+
+/* DONE PAGE */
+.done-wrap{
+  max-width:480px;margin:0 auto;padding:60px 24px;text-align:center;
+}
+.done-ring{
+  width:100px;height:100px;border-radius:50%;
+  background:linear-gradient(135deg,#dcfce7,#bbf7d0);
+  border:3px solid #86efac;
+  display:flex;align-items:center;justify-content:center;
+  font-size:52px;margin:0 auto 24px;
+  box-shadow:0 8px 32px rgba(22,163,74,0.2);
+}
+.done-wrap h2{font-size:22px;font-weight:800;color:#0c2240;margin-bottom:8px;}
+.done-wrap p{color:#64748b;font-size:14px;margin-bottom:32px;line-height:1.6;}
+.done-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.dbtn{
+  padding:12px 22px;border-radius:12px;border:none;
+  font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+}
+.dbtn:hover{transform:translateY(-2px);}
+.db-pdf{background:#f59e0b;color:#fff;box-shadow:0 4px 12px rgba(245,158,11,0.3);}
+.db-home{background:linear-gradient(135deg,#1a3a6b,#2563eb);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.3);}
+.db-hist{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;}
+
+/* REGISTRY */
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.sec-hdr h2{font-size:18px;font-weight:800;color:#0c2240;}
+.add-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+  color:#fff;border:none;border-radius:10px;
+  padding:9px 16px;font-size:13px;font-weight:700;
+  font-family:'Sarabun',sans-serif;cursor:pointer;
+  box-shadow:0 3px 10px rgba(34,197,94,0.3);transition:all 0.2s;
+}
+.add-btn:hover{transform:translateY(-1px);}
+.add-form-box{
+  background:linear-gradient(135deg,#eff6ff,#dbeafe);
+  border:1.5px solid #93c5fd;border-radius:14px;
+  padding:20px;margin-bottom:16px;
+}
+.add-form-box .af-title{font-weight:700;font-size:14px;color:#1d4ed8;margin-bottom:14px;}
+.add-form-box input{background:#fff;border-color:#bfdbfe;margin-bottom:10px;}
+.af-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;}
+.af-btns{display:flex;gap:10px;margin-top:6px;}
+.af-save{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:10px 20px;font-family:'Sarabun',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.af-cancel{background:#fff;color:#64748b;border:1px solid #e2e8f0;border-radius:10px;padding:10px 16px;font-family:'Sarabun',sans-serif;font-size:13px;cursor:pointer;}
+.reg-wrap{background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8ecf3;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.reg-table{width:100%;border-collapse:collapse;}
+.reg-table thead{background:linear-gradient(90deg,#0c2240,#1a3a6b);}
+.reg-table th{padding:12px 16px;text-align:left;font-size:11px;color:#93c5fd;font-weight:700;}
+.reg-table tbody tr{border-bottom:1px solid #f1f5f9;transition:background 0.15s;}
+.reg-table tbody tr:hover{background:#f8fafc;}
+.reg-table td{padding:11px 16px;font-size:12px;color:#334155;}
+.reg-id{font-weight:700;color:#1a3a6b;font-size:12px;}
+.action-btns{display:flex;gap:6px;}
+.eb{padding:5px 10px;border:none;border-radius:8px;cursor:pointer;font-size:11px;font-family:'Sarabun',sans-serif;font-weight:700;}
+.eb-edit{background:#fef3c7;color:#d97706;border:1px solid #fde68a;}
+.eb-del{background:#fee2e2;color:#dc2626;border:1px solid #fecaca;}
+
+/* HISTORY */
+.search-box{
+  background:#fff;border:1.5px solid #e2e8f0;border-radius:12px;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;margin-bottom:16px;
+  box-shadow:0 1px 6px rgba(0,0,0,0.05);
+}
+.search-box input{
+  border:none;background:transparent;margin:0;padding:0;
+  font-size:14px;flex:1;color:#334155;width:auto;
+}
+.search-box input:focus{outline:none;box-shadow:none;}
+.hist-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:16px;
+}
+.hist-card{
+  background:#fff;border:1px solid #e8ecf3;border-radius:14px;
+  padding:18px;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:box-shadow 0.2s;
+}
+.hist-card:hover{box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+.hist-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.hist-id{font-weight:800;color:#0c2240;font-size:15px;}
+.hstat{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.hist-meta{font-size:12px;color:#64748b;line-height:1.8;}
+.hist-bot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9;
+}
+.pdf-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#fff8e1;color:#d97706;border:1px solid #fde68a;
+  border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;
+  font-family:'Sarabun',sans-serif;cursor:pointer;transition:all 0.15s;
+}
+.pdf-btn:hover{background:#fef3c7;}
+.empty-state{text-align:center;padding:60px 20px;color:#94a3b8;}
+.empty-state .ei{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;line-height:1.6;}
+
+/* ══════════════════════════════════════════
+   MOBILE NAV (hidden on desktop)
+══════════════════════════════════════════ */
+#mobile-nav{display:none;}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MOBILE (≤ 768px)
+══════════════════════════════════════════ */
+@media (max-width:768px){
+  /* Hide desktop sidebar */
+  #sidebar{display:none;}
+
+  /* Main fills screen */
+  #main{margin-left:0;}
+
+  /* Top bar slimmer */
+  #topbar{padding:12px 16px;}
+  #topbar h1{font-size:15px;}
+  .tb-time{display:none;}
+
+  /* Content padding */
+  #content{padding:14px 14px 80px;}
+
+  /* Home banner compact */
+  .home-banner{flex-direction:column;align-items:flex-start;gap:0;padding:20px 18px;}
+  .home-banner::before{font-size:60px;right:16px;}
+  .hb-text h2{font-size:17px;}
+  .stat-row{gap:10px;flex-wrap:wrap;}
+  .stat-card{padding:10px 14px;min-width:80px;}
+  .stat-card .snum{font-size:22px;}
+
+  /* Inspect 2-col → 1-col */
+  .inspect-grid{grid-template-columns:1fr;}
+  .inspect-full{grid-column:auto;}
+  .hl-banner{grid-column:auto;padding:14px 16px;}
+  .hb-icon{font-size:36px;}
+  .hb-id{font-size:15px;}
+
+  /* History 1 col */
+  .hist-grid{grid-template-columns:1fr;}
+
+  /* Add form grid → 1 col */
+  .af-grid{grid-template-columns:1fr;}
+
+  /* Table scroll */
+  .table-card,.reg-wrap{overflow-x:auto;}
+
+  /* Done page */
+  .done-wrap{padding:40px 16px;}
+
+  /* Bottom mobile nav */
+  #mobile-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:#fff;border-top:1px solid #e8ecf3;
+    box-shadow:0 -4px 20px rgba(0,0,0,0.08);
+    z-index:300;
+  }
+  .m-tab{
+    flex:1;padding:10px 4px 8px;display:flex;flex-direction:column;
+    align-items:center;cursor:pointer;border:none;background:transparent;
+    font-family:'Sarabun',sans-serif;font-size:10px;color:#94a3b8;
+    transition:all 0.2s;gap:3px;
+  }
+  .m-tab.active{color:#1a3a6b;}
+  .m-tab .mti{font-size:22px;line-height:1;}
+  .m-tab .mtd{width:4px;height:4px;border-radius:50%;background:transparent;}
+  .m-tab.active .mtd{background:#1a3a6b;}
+
+  /* Reg table font */
+  .reg-table th,.reg-table td{padding:9px 10px;font-size:11px;}
+}
+
+@media (max-width:400px){
+  .stat-card{min-width:72px;padding:8px 10px;}
+  .stat-card .snum{font-size:18px;}
+  .hl-table th,.hl-table td{padding:10px 8px;font-size:11px;}
+}
+</style>
+</head>
+<body>
+<div id="layout">
+
+  <!-- ══ DESKTOP SIDEBAR ══ -->
+  <div id="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">🔧</div>
+      <div class="sb-title">ระบบตรวจสอบ<br>แฮนด์ลิฟท์</div>
+      <span class="sb-sub">Hand Pallet Inspection System</span>
+    </div>
+    <div class="sb-nav">
+      <button class="sb-nav-item active" data-page="home" onclick="navigate('home')">
+        <span class="ni">🏠</span> หน้าหลัก
+      </button>
+      <button class="sb-nav-item" data-page="registry" onclick="navigate('registry')">
+        <span class="ni">📋</span> ทะเบียนแฮนด์ลิฟท์
+      </button>
+      <button class="sb-nav-item" data-page="history" onclick="navigate('history')">
+        <span class="ni">📜</span> ประวัติการตรวจ
+      </button>
+    </div>
+    <div class="sb-footer">
+      <p>ระบบตรวจสอบแฮนด์ลิฟท์<br>ความปลอดภัยและอาชีวอนามัย<br>© 2025 Hand Pallet System</p>
+    </div>
+  </div>
+
+  <!-- ══ MAIN AREA ══ -->
+  <div id="main">
+
+    <!-- TOP BAR -->
+    <div id="topbar">
+      <div>
+        <h1 id="page-title">🏠 หน้าหลัก — ทะเบียนแฮนด์ลิฟท์</h1>
+        <span class="tb-sub">ระบบตรวจสอบความปลอดภัยแฮนด์ลิฟท์ก่อนใช้งาน</span>
+      </div>
+      <div class="tb-time" id="clock">00:00</div>
+    </div>
+
+    <!-- SCROLLABLE CONTENT -->
+    <div id="content">
+
+      <!-- ════ HOME ════ -->
+      <div id="page-home" class="page active">
+        <div class="home-banner">
+          <div class="hb-text">
+            <h2>🏭 ทะเบียนแฮนด์ลิฟท์</h2>
+            <p>กดปุ่ม "ตรวจสอบ" เพื่อเริ่มการตรวจสอบก่อนใช้งาน</p>
+            <div class="stat-row">
+              <div class="stat-card"><div class="snum" id="st-total">0</div><div class="slbl">เครื่องทั้งหมด</div></div>
+              <div class="stat-card"><div class="snum" id="st-today">0</div><div class="slbl">ตรวจวันนี้</div></div>
+              <div class="stat-card"><div class="snum" id="st-all">0</div><div class="slbl">ประวัติรวม</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title">รายการแฮนด์ลิฟท์ทั้งหมด · คลิกแถวหรือกดปุ่มเพื่อตรวจสอบ</div>
+        <div class="table-card">
+          <table class="hl-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>รหัสเครื่อง</th>
+                <th>Location</th>
+                <th>พิกัดน้ำหนัก</th>
+                <th>ประเภท</th>
+                <th style="text-align:center;">ดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody id="home-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════ INSPECT ════ -->
+      <div id="page-inspect" class="page">
+        <button class="back-btn" onclick="navigate('home')">← กลับหน้าหลัก</button>
+
+        <div class="inspect-grid">
+          <!-- HL Info Banner (full width) -->
+          <div class="hl-banner inspect-full">
+            <span class="hb-icon">🛺</span>
+            <div>
+              <div class="hb-id" id="hl-bid"></div>
+              <div class="hb-sub" id="hl-bsub"></div>
+            </div>
+            <span class="hb-badge" id="hl-bw"></span>
+          </div>
+
+          <!-- Inspector -->
+          <div class="card">
+            <div class="card-title">👤 ข้อมูลผู้ตรวจสอบ</div>
+            <div class="inp-group">
+              <label class="inp-label">ชื่อ-นามสกุล</label>
+              <input type="text" id="inp-inspector" placeholder="กรอกชื่อผู้ตรวจสอบ"/>
+            </div>
+            <div class="inp-group" style="margin-bottom:0;">
+              <label class="inp-label">แผนก / ฝ่าย</label>
+              <input type="text" id="inp-department" placeholder="กรอกแผนก/ฝ่าย"/>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="card">
+            <div class="card-title">📊 สรุปผลการตรวจ</div>
+            <div class="s-group" id="status-group"></div>
+            <div class="inp-group" style="margin-bottom:0;">
+              <label class="inp-label">หมายเหตุ / รายละเอียดเพิ่มเติม</label>
+              <textarea id="inp-note" placeholder="ระบุหากพบข้อผิดปกติ..."></textarea>
+            </div>
+          </div>
+
+          <!-- Check list (full width) -->
+          <div class="card inspect-full">
+            <div class="card-title">🔍 รายการตรวจสอบ 7 ข้อ</div>
+            <table class="ck-table">
+              <thead>
+                <tr>
+                  <th>รายการ</th>
+                  <th class="ch ok-h">✓ ปกติ</th>
+                  <th class="ch ng-h">✗ ผิดปกติ</th>
+                </tr>
+              </thead>
+              <tbody id="check-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Submit (full width) -->
+          <div class="inspect-full">
+            <button class="submit-btn" onclick="submitInspection()">💾 บันทึกผลการตรวจสอบ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ DONE ════ -->
+      <div id="page-done" class="page">
+        <div class="done-wrap">
+          <div class="done-ring">✅</div>
+          <h2>บันทึกสำเร็จ!</h2>
+          <p id="done-msg">การตรวจสอบถูกบันทึกเรียบร้อยแล้ว</p>
+          <div class="done-btns">
+            <button class="dbtn db-pdf" onclick="generatePDF()">📄 บันทึก PDF</button>
+            <button class="dbtn db-home" onclick="navigate('home')">🏠 กลับหน้าหลัก</button>
+            <button class="dbtn db-hist" onclick="navigate('history')">📜 ดูประวัติ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ REGISTRY ════ -->
+      <div id="page-registry" class="page">
+        <div class="sec-hdr">
+          <h2>📋 ทะเบียนแฮนด์ลิฟท์</h2>
+          <button class="add-btn" id="add-toggle-btn" onclick="toggleAddForm()">＋ เพิ่มเครื่องใหม่</button>
+        </div>
+        <div id="add-form-container"></div>
+        <div id="edit-form-container"></div>
+        <div class="reg-wrap">
+          <table class="reg-table">
+            <thead>
+              <tr>
+                <th>รหัส</th>
+                <th>พิกัดน้ำหนัก</th>
+                <th>Location</th>
+                <th>ประเภท</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="registry-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════ HISTORY ════ -->
+      <div id="page-history" class="page">
+        <div class="sec-hdr">
+          <h2 id="hist-title">📜 ประวัติการตรวจสอบ</h2>
+        </div>
+        <div class="search-box">
+          <span style="color:#94a3b8;font-size:16px;">🔍</span>
+          <input type="text" id="history-search" placeholder="ค้นหาด้วยรหัสเครื่อง หรือชื่อผู้ตรวจสอบ..." oninput="renderHistory()"/>
+        </div>
+        <div class="hist-grid" id="history-list"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ══ MOBILE BOTTOM NAV ══ -->
+<div id="mobile-nav">
+  <button class="m-tab active" data-page="home" onclick="navigate('home')">
+    <span class="mti">🏠</span>หน้าหลัก<span class="mtd"></span>
+  </button>
+  <button class="m-tab" data-page="registry" onclick="navigate('registry')">
+    <span class="mti">📋</span>ทะเบียน<span class="mtd"></span>
+  </button>
+  <button class="m-tab" data-page="history" onclick="navigate('history')">
+    <span class="mti">📜</span>ประวัติ<span class="mtd"></span>
+  </button>
+</div>
+
+<script>
+// ══════════════════════════
+//  DATA & CONSTANTS
+// ══════════════════════════
+const CHECK_ITEMS = [
+  "ตัวรถ/โครงไม่งอ","งาไม่ร้าว/ไม่คด","ล้อหมุนดี/ไม่บิ่น",
+  "ด้ามปั๊บปไม่ผิด","ไฮดรอลิกไม่รั่ว","คันโยกทำงานครบ","ยก-ลงไม่กระตุก"
+];
+const STATUS_OPTIONS = ["ใช้งานได้ปกติ","ต้องซ่อม/แจ้งซ่อม","ห้ามใช้งาน"];
+const SC = {"ใช้งานได้ปกติ":"#16a34a","ต้องซ่อม/แจ้งซ่อม":"#d97706","ห้ามใช้งาน":"#dc2626"};
+const SB = {"ใช้งานได้ปกติ":"#dcfce7","ต้องซ่อม/แจ้งซ่อม":"#fef3c7","ห้ามใช้งาน":"#fee2e2"};
+
+const DEFAULT_HL = [
+  {id:"MHP-DS-NO.1", weight:"1.5 TONS",location:"WIP CALOTTE 2",    type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.5", weight:"1.5 TONS",location:"WIP CALOTTE 1,3",  type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.3", weight:"2.5 TONS",location:"ASSY",             type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.4", weight:"2.5 TONS",location:"ASSY",             type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.15",weight:"2 TONS",  location:"ASSY",             type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.14",weight:"2.5 TONS",location:"วัสดิ์สิ้นเปลือง", type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.7", weight:"2.5 TONS",location:"WIP CALOTTE",      type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.18",weight:"2 TONS",  location:"WIP CALOTTE",      type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.2", weight:"2.5 TONS",location:"SUPPORT FAB-A",    type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.17",weight:"3 TONS",  location:"EXPORT",           type:"แมนนวล (Manual Hand Pallet)"},
+  {id:"MHP-DS-NO.19",weight:"2.5 TONS",location:"NV",               type:"แมนนวล (Manual Hand Pallet)"},
+];
+
+const PAGE_TITLES = {
+  home:     "🏠 หน้าหลัก — ทะเบียนแฮนด์ลิฟท์",
+  inspect:  "✅ แบบฟอร์มตรวจสอบ",
+  done:     "✅ บันทึกสำเร็จ",
+  registry: "📋 จัดการทะเบียนแฮนด์ลิฟท์",
+  history:  "📜 ประวัติการตรวจสอบ",
+};
+
+// ══════════════════════════
+//  STORAGE
+// ══════════════════════════
+function ls(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+let handlifts = ls('hlr4_reg', DEFAULT_HL);
+let histRec   = ls('hlr4_hist', []);
+let selHl=null, checks=Array(7).fill(null), selStatus='', lastRec=null, showAdd=false, editHl=null;
+
+// ══════════════════════════
+//  CLOCK
+// ══════════════════════════
+function tick(){
+  const n=new Date();
+  const h=n.getHours().toString().padStart(2,'0');
+  const m=n.getMinutes().toString().padStart(2,'0');
+  document.getElementById('clock').textContent=h+':'+m;
+}
+tick(); setInterval(tick,10000);
+
+// ══════════════════════════
+//  NAVIGATE
+// ══════════════════════════
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-nav-item,.m-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll(`[data-page="${page}"]`).forEach(el=>el.classList.add('active'));
+  document.getElementById('page-title').textContent = PAGE_TITLES[page]||'';
+  document.getElementById('content').scrollTop=0;
+  if(page==='home')     renderHome();
+  if(page==='registry') renderRegistry();
+  if(page==='history')  renderHistory();
+}
+
+// ══════════════════════════
+//  HOME
+// ══════════════════════════
+function renderHome(){
+  const today=new Date().toLocaleDateString('th-TH');
+  const todayCnt=histRec.filter(r=>new Date(r.id).toLocaleDateString('th-TH')===today).length;
+  document.getElementById('st-total').textContent=handlifts.length;
+  document.getElementById('st-today').textContent=todayCnt;
+  document.getElementById('st-all').textContent=histRec.length;
+
+  document.getElementById('home-tbody').innerHTML=handlifts.map((hl,i)=>`
+    <tr onclick="startInspection('${hl.id}')">
+      <td style="color:#94a3b8;font-size:12px;">${i+1}</td>
+      <td>
+        <div class="hl-id">${hl.id}</div>
+      </td>
+      <td><div class="hl-loc">📍 ${hl.location}</div></td>
+      <td><span class="wbadge">${hl.weight}</span></td>
+      <td style="font-size:11px;color:#64748b;">${hl.type}</td>
+      <td style="text-align:center;">
+        <button class="insp-btn" onclick="event.stopPropagation();startInspection('${hl.id}')">✅ ตรวจสอบ</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════
+//  INSPECTION
+// ══════════════════════════
+function startInspection(id){
+  selHl=handlifts.find(h=>h.id===id);
+  checks=Array(7).fill(null); selStatus='';
+  document.getElementById('inp-inspector').value='';
+  document.getElementById('inp-department').value='';
+  document.getElementById('inp-note').value='';
+  document.getElementById('hl-bid').textContent=selHl.id;
+  document.getElementById('hl-bsub').textContent=`📍 ${selHl.location}  ·  ${selHl.type}`;
+  document.getElementById('hl-bw').textContent=selHl.weight;
+
+  document.getElementById('check-tbody').innerHTML=CHECK_ITEMS.map((item,i)=>`
+    <tr>
+      <td>${i+1}. ${item}</td>
+      <td class="ch"><button class="rbtn" id="ok-${i}" onclick="setCheck(${i},true)">✓</button></td>
+      <td class="ch"><button class="rbtn" id="ng-${i}" onclick="setCheck(${i},false)">✗</button></td>
+    </tr>`).join('');
+
+  document.getElementById('status-group').innerHTML=STATUS_OPTIONS.map(s=>`
+    <button class="s-chip" id="chip-${encodeURIComponent(s)}" onclick="setStatus('${s}')"
+      style="border-color:${SC[s]};color:${SC[s]};">${s}</button>`).join('');
+
+  navigate('inspect');
+}
+
+function setCheck(i,val){
+  checks[i]=val;
+  document.getElementById(`ok-${i}`).className='rbtn'+(val===true?' ok-on':'');
+  document.getElementById(`ng-${i}`).className='rbtn'+(val===false?' ng-on':'');
+}
+
+function setStatus(s){
+  selStatus=s;
+  STATUS_OPTIONS.forEach(opt=>{
+    const el=document.getElementById(`chip-${encodeURIComponent(opt)}`);
+    if(!el)return;
+    el.style.background=opt===s?SC[s]:'transparent';
+    el.style.color=opt===s?'#fff':SC[opt];
+  });
+}
+
+function submitInspection(){
+  const inspector=document.getElementById('inp-inspector').value.trim();
+  const department=document.getElementById('inp-department').value.trim();
+  const note=document.getElementById('inp-note').value.trim();
+  if(!inspector||!department){alert('กรุณากรอกชื่อและแผนก');return;}
+  if(checks.some(c=>c===null)){alert('กรุณาตรวจสอบทุกรายการ (7 ข้อ)');return;}
+  if(!selStatus){alert('กรุณาเลือกสรุปผล');return;}
+  lastRec={
+    id:Date.now(), date:new Date().toLocaleString('th-TH'),
+    handlift:{...selHl}, inspector, department,
+    checks:[...checks], status:selStatus, note
+  };
+  histRec=[lastRec,...histRec];
+  ss('hlr4_hist',histRec);
+  document.getElementById('done-msg').textContent=
+    `การตรวจสอบ ${lastRec.handlift.id}  วันที่ ${lastRec.date}  บันทึกเรียบร้อยแล้ว`;
+  navigate('done');
+}
+
+// ══════════════════════════
+//  PDF
+// ══════════════════════════
+function generatePDF(rec){
+  rec=rec||lastRec; if(!rec)return;
+  const rows=CHECK_ITEMS.map((item,i)=>`
+    <tr>
+      <td style="padding:8px 12px;border:1px solid #e2e8f0;">${i+1}. ${item}</td>
+      <td style="text-align:center;border:1px solid #e2e8f0;width:80px;">${rec.checks[i]===true?'✅':''}</td>
+      <td style="text-align:center;border:1px solid #e2e8f0;width:80px;">${rec.checks[i]===false?'❌':''}</td>
+    </tr>`).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="utf-8"/>
+    <title>ใบตรวจสอบ - ${rec.handlift.id}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'Sarabun',sans-serif;padding:36px;color:#1a1a1a;font-size:14px;}
+      .pbtn{float:right;padding:9px 22px;background:#1a3a6b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:700;margin-bottom:16px;}
+      .hdr{text-align:center;margin-bottom:24px;border-bottom:3px solid #1a3a6b;padding-bottom:16px;}
+      .hdr h1{font-size:20px;color:#1a3a6b;margin-bottom:5px;}
+      .hdr p{font-size:12px;color:#64748b;}
+      .sec{background:#f8fafc;border-radius:10px;padding:16px;margin-bottom:16px;border:1px solid #e2e8f0;}
+      .sec strong{display:block;font-size:13px;color:#1a3a6b;margin-bottom:10px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;font-weight:700;}
+      .ig{display:grid;grid-template-columns:150px 1fr;gap:5px 0;font-size:13px;}
+      .lb{color:#64748b;}
+      table{width:100%;border-collapse:collapse;margin-top:6px;}
+      th{background:#1a3a6b;color:#fff;padding:10px 12px;text-align:left;font-size:13px;}
+      .sbadge{display:inline-block;padding:6px 18px;border-radius:20px;font-weight:700;font-size:14px;}
+      .sig-row{display:flex;justify-content:space-between;margin-top:56px;}
+      .sig-box{text-align:center;width:200px;}
+      .sig-line{border-top:1px solid #334155;margin-top:56px;padding-top:8px;font-size:12px;color:#64748b;}
+      @media print{.pbtn{display:none}}
+    </style>
+  </head><body>
+    <button class="pbtn" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+    <div class="hdr">
+      <h1>🔧 ใบตรวจสอบแฮนด์ลิฟท์ก่อนใช้งาน</h1>
+      <p>ระบบตรวจสอบความปลอดภัยแฮนด์ลิฟท์ก่อนใช้งาน | วันที่: ${rec.date}</p>
+    </div>
+    <div class="sec"><strong>ข้อมูลแฮนด์ลิฟท์</strong>
+      <div class="ig">
+        <span class="lb">รหัสเครื่อง:</span><span><b>${rec.handlift.id}</b></span>
+        <span class="lb">พิกัดน้ำหนัก:</span><span>${rec.handlift.weight}</span>
+        <span class="lb">ตำแหน่ง:</span><span>${rec.handlift.location}</span>
+        <span class="lb">ประเภท:</span><span>${rec.handlift.type}</span>
+      </div>
+    </div>
+    <div class="sec"><strong>ผู้ตรวจสอบ</strong>
+      <div class="ig">
+        <span class="lb">ชื่อ-นามสกุล:</span><span>${rec.inspector}</span>
+        <span class="lb">แผนก/ฝ่าย:</span><span>${rec.department}</span>
+      </div>
+    </div>
+    <div class="sec"><strong>รายการตรวจสอบ</strong>
+      <table>
+        <tr><th>รายการ</th><th style="width:80px;text-align:center;">ปกติ ✅</th><th style="width:80px;text-align:center;">ผิดปกติ ❌</th></tr>
+        ${rows}
+      </table>
+    </div>
+    <div class="sec"><strong>สรุปผลการตรวจสอบ</strong>
+      <span class="sbadge" style="background:${SB[rec.status]};color:${SC[rec.status]};border:2px solid ${SC[rec.status]};">${rec.status}</span>
+      ${rec.note?`<p style="margin-top:12px;font-size:13px;">📝 หมายเหตุ: ${rec.note}</p>`:''}
+    </div>
+    <div class="sig-row">
+      <div class="sig-box"><div class="sig-line">ผู้ตรวจสอบ<br>${rec.inspector}</div></div>
+      <div class="sig-box"><div class="sig-line">หัวหน้างาน / ผู้ควบคุม<br>&nbsp;</div></div>
+      <div class="sig-box"><div class="sig-line">วันที่ตรวจสอบ<br>${rec.date}</div></div>
+    </div>
+  </body></html>`);
+  w.document.close();
+}
+
+// ══════════════════════════
+//  REGISTRY
+// ══════════════════════════
+function renderRegistry(){
+  document.getElementById('registry-tbody').innerHTML=handlifts.map(hl=>`
+    <tr>
+      <td class="reg-id">${hl.id}</td>
+      <td>${hl.weight}</td>
+      <td style="color:#64748b;">${hl.location}</td>
+      <td style="color:#94a3b8;font-size:11px;">${hl.type}</td>
+      <td><div class="action-btns">
+        <button class="eb eb-edit" onclick="startEdit('${hl.id}')">✏️ แก้ไข</button>
+        <button class="eb eb-del"  onclick="deleteHl('${hl.id}')">🗑️ ลบ</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function toggleAddForm(){
+  showAdd=!showAdd;
+  const btn=document.getElementById('add-toggle-btn');
+  btn.textContent=showAdd?'✕ ยกเลิก':'＋ เพิ่มเครื่องใหม่';
+  btn.style.background=showAdd?'#64748b':'';
+  document.getElementById('add-form-container').innerHTML=showAdd
+    ?buildForm('add',{id:'',weight:'',location:'',type:'แมนนวล (Manual Hand Pallet)'}):'';
+}
+
+function buildForm(mode,d){
+  return `<div class="add-form-box">
+    <div class="af-title">${mode==='edit'?'✏️ แก้ไขข้อมูลแฮนด์ลิฟท์':'➕ เพิ่มแฮนด์ลิฟท์ใหม่'}</div>
+    <div class="af-grid">
+      <div>
+        <label class="inp-label">รหัสแฮนด์ลิฟท์</label>
+        <input id="form-id" type="text" placeholder="เช่น MHP-DS-NO.20" value="${d.id}" ${mode==='edit'?'disabled':''}/>
+      </div>
+      <div>
+        <label class="inp-label">พิกัดน้ำหนัก</label>
+        <input id="form-weight" type="text" placeholder="เช่น 2.5 TONS" value="${d.weight}"/>
+      </div>
+      <div>
+        <label class="inp-label">Location</label>
+        <input id="form-location" type="text" placeholder="เช่น ASSY" value="${d.location}"/>
+      </div>
+      <div>
+        <label class="inp-label">ประเภท</label>
+        <input id="form-type" type="text" value="${d.type}"/>
+      </div>
+    </div>
+    <div class="af-btns">
+      <button class="af-save" onclick="saveForm('${mode}')">💾 บันทึก</button>
+      <button class="af-cancel" onclick="cancelForm('${mode}')">ยกเลิก</button>
+    </div>
+  </div>`;
+}
+
+function saveForm(mode){
+  const id=document.getElementById('form-id').value.trim();
+  const weight=document.getElementById('form-weight').value.trim();
+  const location=document.getElementById('form-location').value.trim();
+  const type=document.getElementById('form-type').value.trim();
+  if(!id||!weight||!location){alert('กรอกข้อมูลให้ครบ');return;}
+  if(mode==='add'){
+    if(handlifts.find(h=>h.id===id)){alert('รหัสนี้มีอยู่แล้วในระบบ');return;}
+    handlifts=[...handlifts,{id,weight,location,type}];
+  } else {
+    handlifts=handlifts.map(h=>h.id===id?{id,weight,location,type}:h);
+  }
+  ss('hlr4_reg',handlifts);
+  showAdd=false; editHl=null;
+  document.getElementById('add-form-container').innerHTML='';
+  document.getElementById('edit-form-container').innerHTML='';
+  const btn=document.getElementById('add-toggle-btn');
+  btn.textContent='＋ เพิ่มเครื่องใหม่'; btn.style.background='';
+  renderRegistry();
+}
+
+function cancelForm(mode){
+  if(mode==='add'){
+    showAdd=false;
+    document.getElementById('add-form-container').innerHTML='';
+    const btn=document.getElementById('add-toggle-btn');
+    btn.textContent='＋ เพิ่มเครื่องใหม่'; btn.style.background='';
+  } else {
+    editHl=null;
+    document.getElementById('edit-form-container').innerHTML='';
+  }
+}
+
+function startEdit(id){
+  editHl=handlifts.find(h=>h.id===id);
+  document.getElementById('edit-form-container').innerHTML=buildForm('edit',editHl);
+  document.getElementById('edit-form-container').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function deleteHl(id){
+  if(confirm(`ลบ ${id} ออกจากทะเบียนใช่ไหม?`)){
+    handlifts=handlifts.filter(h=>h.id!==id);
+    ss('hlr4_reg',handlifts);
+    renderRegistry();
+  }
+}
+
+// ══════════════════════════
+//  HISTORY
+// ══════════════════════════
+function renderHistory(){
+  const q=(document.getElementById('history-search')||{value:''}).value.toLowerCase();
+  const filtered=histRec.filter(r=>!q||r.handlift.id.toLowerCase().includes(q)||r.inspector.toLowerCase().includes(q));
+  const title=document.getElementById('hist-title');
+  if(title) title.textContent=`📜 ประวัติการตรวจสอบ (${histRec.length} รายการ)`;
+  const list=document.getElementById('history-list');
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state" style="grid-column:1/-1;">
+      <div class="ei">${histRec.length===0?'📋':'🔍'}</div>
+      <p>${histRec.length===0?'ยังไม่มีประวัติการตรวจสอบ<br>กลับหน้าหลักเพื่อเริ่มตรวจสอบ':'ไม่พบรายการที่ค้นหา'}</p>
+    </div>`;
+    return;
+  }
+  list.innerHTML=filtered.map(rec=>`
+    <div class="hist-card">
+      <div class="hist-top">
+        <div class="hist-id">${rec.handlift.id}</div>
+        <span class="hstat" style="background:${SB[rec.status]};color:${SC[rec.status]};border:1px solid ${SC[rec.status]};">${rec.status}</span>
+      </div>
+      <div class="hist-meta">
+        📅 ${rec.date}<br>
+        👤 ${rec.inspector} &nbsp;|&nbsp; 🏢 ${rec.department}<br>
+        📍 ${rec.handlift.location} &nbsp;·&nbsp; ⚖️ ${rec.handlift.weight}
+      </div>
+      <div class="hist-bot">
+        <span style="font-size:11px;color:#94a3b8;">
+          ${rec.checks.filter(c=>c===true).length}/7 รายการปกติ${rec.note?' · 📝 มีหมายเหตุ':''}
+        </span>
+        <button class="pdf-btn" onclick='generatePDF(${JSON.stringify(rec)})'>📄 ดาวน์โหลด PDF</button>
+      </div>
+    </div>`).join('');
+}
+
+// INIT
+renderHome();
+</script>
+</body>
+</html>
